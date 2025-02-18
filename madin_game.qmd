@@ -46,23 +46,27 @@ a
 ```{r}
 evalutate_guess<-function(guess, solution){
   found=0
+  letter_match=0
+  position_match=0
   for (i in 1:length(guess)){
     for (j in 1:length(solution)){
-      print(guess[i])
-      print(solution[j])
-      if (i==j & guess[i] == solution[j]){
+       if (i==j & guess[i] == solution[j]){
         print(paste("You letter",guess[i],"is in the right position in the word"))
+        position_match=position_match+1
         found = found + 1
         }
       else if (guess[i] == solution[j]){
-        print(paste("You letter",guess[i],"is in the word but in the right position"))
+        print(paste("You letter",guess[i],"is in the word but not in the right position"))
+        letter_match=letter_match+1
         found = found + 1
       }
-      else { print(paste("You guessed ",found," letters of the word! Keep going"))}
-        
-      }
+      else { next}
     }
+  }
+  print(paste("You have guessed ",letter_match+position_match," letters of the word! Keep going"))
 } 
+  
+  
 check_guess<-function(guess,solution){
 if (is.null(guess))  {
   print("Empty word! Enter the word!")
@@ -97,6 +101,7 @@ for (i in guess){
   print(guess[i])
 }
 
+setdiff(guess,a)
 
 
 ```

@@ -5,10 +5,7 @@ format: html
 editor: visual
 ---
 
-I will try to make wordle game! WOW excited! Can't wait when it will be done!
-## Running Code
-
- 
+I will try to make wordle game! WOW excited! Can't wait when it will be done! \## Running Code
 
 ```{r}
 library(tidyverse)
@@ -44,65 +41,85 @@ pick_solution<-function(table, n){
  
 a<-pick_solution(solution_list,5)
 a
+```
 
+```{r}
 evalutate_guess<-function(guess, solution){
   found=0
-  for (i in guess){
-    for (j in solution){
-      if (i==j & guess[i] == solution[j]){
-        print("You letter",guess[i],"is in the right position in the word")
+  letter_match=0
+  position_match=0
+  for (i in 1:length(guess)){
+    for (j in 1:length(solution)){
+       if (i==j & guess[i] == solution[j]){
+        print(paste("You letter",guess[i],"is in the right position in the word"))
+        position_match=position_match+1
         found = found + 1
         }
       else if (guess[i] == solution[j]){
-        print("You letter",guess[i],"is in the word but in the right position")
+        print(paste("You letter",guess[i],"is in the word but not in the right position"))
+        letter_match=letter_match+1
         found = found + 1
       }
-      else { print("You guessed ", found, " letters of the word! Keep going")}
-        
-      }
+      else { next}
     }
+  }
+  print(paste("You have guessed ",letter_match+position_match," letters of the word!"))
+  if (length(setdiff(guess, sollution)) == 0){
+    output = 1
+  }
+  else {output = 0}
+  return(output)
+  
 } 
+  
+  
+check_guess<-function(guess,solution,valid_list){
+Flag="No"
+guess_word <- paste(guess, collapse = "")
+if (is.null(guess))  {
+  print("Empty word! Enter the word!")
+  Flag="No"
+  } else if (length(guess) != length(solution)) {
+    print("Enter only the same length words as hidden behind")
+    Flag="No"
+  }
+  else if (!(guess_word %in% valid_list)){
+    print("Enter the valid words only!")
+    Flag="No"
+  }
+  else {
+      Flag="Yes"}
+return(Flag)
+}
 
 play_wordle <- function(solution, valid_list, num_guesses=6){
   print("Welcome to the Wordle game by Madina")
   print("You have 6 chances to predict the word hidden behind the blocks")
   print("When you guess right the letter will be present")
-  guess <- readline("Type your word, then press <enter>: ") |> toupper()
-  if (guess == "") {
-  print("Please enter the word:")
-  guess <- readline("Type your word, then press <enter>: ") |> toupper()
+  Flag="No"
+  if (Flag == "No") {
+  enter <- toupper(readline("Type your word, then press <enter>: "))
+  guess<-unlist(strsplit(enter, split = ""))
+  check_guess(guess,solution,valid_list)
   }
-  else if (length(guess) != length(solution)) {
-    print("Enter only 5 letter words")
-    guess <- readline("Type your word, then press <enter>: ") |> toupper()
-
+  if (Flag=="Yes"){
+    evalutate_guess(guess,solution)
   }
-  else { evalutate_guess(guess,solution) }
 }
 play_wordle(a,valid_list,6)
 
-Flag="No"
-
-check_guess<-function(guess){
-if (guess == "") {
-  print("Empty word! Enter the word!")
-  Flag="No"
-  } else if (length(guess) != length(a)) {
-    print("Enter only the same length words as hidden behind")
-    Flag="No"
-  } else { evalutate_guess(guess,solution)
-      Flag="Yes"}
+###test
+enter <- toupper(readline("Type your word, then press <enter>: "))
+guess<-unlist(strsplit(enter, split = ""))
+for (i in guess){
+  print(guess[i])
 }
+a
+setdiff(guess,a)
 
-if (Flag == "No") {
-  guess <- toupper(readline("Type your word, then press <enter>: "))
-  check_guess(guess)
-}
-Flag="Yes"
-#guess <- readline("Type your word, then press <enter>: ") |> toupper()
+```
 
-
-
+```{r}
 df <- data.frame(
   x = 1:length(a),
   y = 1,
