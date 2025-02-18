@@ -1,0 +1,133 @@
+---
+title: "game"
+format: html
+editor: visual
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+library(tidyverse)
+library(dplyr)
+
+load_dictionary<-function(filename)
+{
+  x<-read_csv(filename)
+  return (x)
+}
+valid_list <- load_dictionary("collins-scrabble-words-2019.txt")
+solution_list <- load_dictionary("google-10000-english-usa-no-swears.txt")
+
+#Step 2
+
+solution_list<-intersect(solution_list, valid_list)
+```
+
+```{r}
+
+pick_solution<-function(table, n){ 
+  filtered_df <- subset(table, nchar(words) == n)
+  w<-sample(filtered_df[[1]], size = 1, replace = FALSE)
+  word_array<-unlist(strsplit(w, split = ""))
+  return(word_array)
+}
+
+ 
+a<-pick_solution(solution_list,5)
+a
+```
+
+```{r}
+evalutate_guess<-function(guess, solution){
+  found=0
+  for (i in 1:length(guess)){
+    for (j in 1:length(solution)){
+      print(guess[i])
+      print(solution[j])
+      if (i==j & guess[i] == solution[j]){
+        print(paste("You letter",guess[i],"is in the right position in the word"))
+        found = found + 1
+        }
+      else if (guess[i] == solution[j]){
+        print(paste("You letter",guess[i],"is in the word but in the right position"))
+        found = found + 1
+      }
+      else { print(paste("You guessed ",found," letters of the word! Keep going"))}
+        
+      }
+    }
+} 
+check_guess<-function(guess,solution){
+if (is.null(guess))  {
+  print("Empty word! Enter the word!")
+  Flag="No"
+  } else if (length(guess) != length(solution)) {
+    print("Enter only the same length words as hidden behind")
+    Flag="No"
+  } else { evalutate_guess(guess,solution)
+      Flag="Yes"}
+}
+
+play_wordle <- function(solution, valid_list, num_guesses=6){
+  print("Welcome to the Wordle game by Madina")
+  print("You have 6 chances to predict the word hidden behind the blocks")
+  print("When you guess right the letter will be present")
+  Flag="No"
+  if (Flag == "No") {
+  enter <- toupper(readline("Type your word, then press <enter>: "))
+  guess<-unlist(strsplit(enter, split = ""))
+  print(length(guess))
+  check_guess(guess,solution)
+  }
+  if (Flag=="Yes"){
+    evalutate_guess(guess,solution)
+  }
+}
+play_wordle(a,valid_list,6)
+
+enter <- toupper(readline("Type your word, then press <enter>: "))
+guess<-unlist(strsplit(enter, split = ""))
+for (i in guess){
+  print(guess[i])
+}
+
+
+
+```
+
+```{r}
+Flag="Yes"
+#guess <- readline("Type your word, then press <enter>: ") |> toupper()
+
+
+
+df <- data.frame(
+  x = 1:length(a),
+  y = 1,
+  letters = rep("",length(a))
+)
+
+# Plot boxes with letters
+ggplot(df, aes(x = x, y = y, label = letters)) +
+  geom_tile(fill = "white", color = "black", size = 2) +  # Boxes
+  geom_text(size = 8) +  # Letters
+  theme_void() +  # Remove background
+  coord_fixed()
+
+
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+2 * 2
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
