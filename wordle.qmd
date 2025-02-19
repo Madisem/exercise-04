@@ -7,24 +7,15 @@ editor: visual
 
 I will try to make wordle game! WOW excited! Can't wait when it will be done! \## Running Code
 
-```{r}
+```{r, include=FALSE}
 library(tidyverse)
+library(dplyr)
+
 load_dictionary<-function(filename)
 {
   x<-read_csv(filename)
   return (x)
 }
-valid_list <- load_dictionary("collins-scrabble-words-2019.txt")
-solution_list <- load_dictionary("google-10000-english-usa-no-swears.txt")
-
-str(valid_list)
-str(solution_list)
-#Step 2
-solution_list<-intersect(solution_list, valid_list)
-```
-```{r}
-library(dplyr)
-
 pick_solution<-function(table, n){ 
   filtered_df <- subset(table, nchar(words) == n)
   w<-sample(filtered_df[[1]], size = 1, replace = FALSE)
@@ -34,36 +25,9 @@ pick_solution<-function(table, n){
 
 ```
 
-```{r}
-evalutate_guess<-function(guess, solution){
-  found=0
-  letter_match=0
-  position_match=0
-  for (i in 1:length(guess)){
-    for (j in 1:length(solution)){
-       if (i==j & guess[i] == solution[j]){
-        print(paste("You letter",guess[i],"is in the right position in the word"))
-        position_match=position_match+1
-        found = found + 1
-        }
-      else if (guess[i] == solution[j]){
-        print(paste("You letter",guess[i],"is in the word but not in the right position"))
-        letter_match=letter_match+1
-        found = found + 1
-      }
-      else { next}
-    }
-  }
-  print(paste("You have guessed ",letter_match+position_match," letters of the word!"))
-  if (length(setdiff(guess, solution)) == 0){
-    output = 1
-  }
-  else {output = 0}
-  return(output)
-  
-} 
-  
-  
+Checking for the valid entry of the input and evalutating the word!
+```{r, include=FALSE}
+
 check_guess<-function(guess,solution,valid_list){
 guess_word <- paste(guess, collapse = "")
 if (is.null(guess))  {
@@ -77,17 +41,35 @@ if (is.null(guess))  {
     print("Enter the valid words only!")
     Flag="No"
   }
-  else {
-      Flag="Yes"
-      print(Flag)
-      }
+  else { Flag="Yes"}
 return(Flag)
 }
+  
+evalutate_guess<-function(guess, solution){
+  for (i in 1:length(guess)){
+    for (j in 1:length(solution)){
+       if (i==j & guess[i] == solution[j]){
+        print(paste("You letter",guess[i],"is in the right position in the word"))
+           }
+      else if (guess[i] == solution[j]){
+        print(paste("You letter",guess[i],"is in the word but not in the right position"))
+         }
+      else { next}
+    }
+  }
+  if (length(setdiff(guess, solution)) == 0){
+    output = 1
+  }
+  else {output = 0}
+  return(output)
+} 
 
+#### main funciton to play the game
 play_wordle <- function(solution, valid_list, num_guesses=6){
-  print("You have 6 chances to predict the hidden word")
   i=0
   result = 0
+  found<-character(0)
+  not_found_letters<-LETTERS
   while (i<7 | result == 0) {
     Flag="No"
     while (Flag == "No") {
@@ -96,26 +78,56 @@ play_wordle <- function(solution, valid_list, num_guesses=6){
       Flag=check_guess(guess,solution,valid_list)
       }
     result<-evalutate_guess(guess,solution)
-    setdiff(LETTERS,guess)
-    i=i+1
     if (result == 1){
       print("Congratulations you have guessed the word correctly!")
     }
+    else{
+    ### to highlight found letters; all together
+    found_letter<-intersect(guess, solution)
+    if (length(found_letter) > 0){
+    found<-union(found, found_letter)
+    print("Letters you have found already: ")
+    print(found)
+    }
+    ### to highlight not found but tried letters; all together
+    not_found<-setdiff(not_found_letters, guess)
+    not_found_letters<-unique(c(not_found, found_letter))
+    print("Letters to consider: ")
+    print(not_found_letters) 
+    }
+    i=i+1
   }
-  print("Unforturnately, You run out of the chances!")}
+  if (result == 0 ) {
+  print("Unforturnately, You run out of the chances and you lost the game! Try again!")}
+  }
 ```
 
-Start of the Game! Just run those lines of code! 
+```{r, include=FALSE}
 
-```{r}
-### to start run the following line of the codes;
-###before these lines are funcitons;
+run_this<-function(valid_list,solution_list){
 
 print("Welcome to the Wordle game by Madina")
-n <- as.integer(readline("Please chose the length of the word you want to play, then press <enter>: "))
-print(LETTERS)
+print("You have 6 chances to predict the hidden word")
+
+n <- as.integer(readline("Please choose the length of the word you want to play, then press <enter>: "))
 a<-pick_solution(solution_list,n)
+print("Your letters:")
+print(LETTERS)
 play_wordle(a,valid_list)
+}
+```
+Start of the Game! Just run those lines of code!
+
+```{r, include=FALSE}
+### to start run the following line of the codes;
+###before these lines are funcitons;
+valid_list <- load_dictionary("collins-scrabble-words-2019.txt")
+solution_list <- load_dictionary("google-10000-english-usa-no-swears.txt")
+solution_list<-intersect(solution_list, valid_list)
+
+run_this(valid_list,solution_list)
+
+
 
 ### Wanted to do in boxes and good representation, but couldnt;
 
