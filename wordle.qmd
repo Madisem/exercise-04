@@ -19,15 +19,9 @@ solution_list <- load_dictionary("google-10000-english-usa-no-swears.txt")
 
 str(valid_list)
 str(solution_list)
-
-
 #Step 2
-
 solution_list<-intersect(solution_list, valid_list)
 ```
-
-You can add options to executable code like this
-
 ```{r}
 library(dplyr)
 
@@ -91,7 +85,7 @@ return(Flag)
 }
 
 play_wordle <- function(solution, valid_list, num_guesses=6){
-  print("You have 6 chances to predict the word hidden behind the blocks")
+  print("You have 6 chances to predict the hidden word")
   i=0
   result = 0
   while (i<7 | result == 0) {
@@ -102,6 +96,7 @@ play_wordle <- function(solution, valid_list, num_guesses=6){
       Flag=check_guess(guess,solution,valid_list)
       }
     result<-evalutate_guess(guess,solution)
+    setdiff(LETTERS,guess)
     i=i+1
     if (result == 1){
       print("Congratulations you have guessed the word correctly!")
@@ -110,11 +105,19 @@ play_wordle <- function(solution, valid_list, num_guesses=6){
   print("Unforturnately, You run out of the chances!")}
 ```
 
-Start of the Game!
+Start of the Game! Just run those lines of code! 
 
 ```{r}
+### to start run the following line of the codes;
+###before these lines are funcitons;
+
 print("Welcome to the Wordle game by Madina")
 n <- as.integer(readline("Please chose the length of the word you want to play, then press <enter>: "))
+print(LETTERS)
+a<-pick_solution(solution_list,n)
+play_wordle(a,valid_list)
+
+### Wanted to do in boxes and good representation, but couldnt;
 
 df <- data.frame(
   x = 1:n,
@@ -128,31 +131,6 @@ ggplot(df, aes(x = x, y = y, label = letters)) +
   geom_text(size = 8) +  # Letters
   theme_void() +  # Remove background
   coord_fixed()
-
-
-print(LETTERS)
-a<-pick_solution(solution_list,n)
-play_wordle(a,valid_list)
-
- 
- 
-```
-
-```{r}
-df <- data.frame(
-  x = 1:length(a),
-  y = 1,
-  letters = rep("",length(a))
-)
-
-# Plot boxes with letters
-ggplot(df, aes(x = x, y = y, label = letters)) +
-  geom_tile(fill = "white", color = "black", size = 2) +  # Boxes
-  geom_text(size = 8) +  # Letters
-  theme_void() +  # Remove background
-  coord_fixed()
-
-
 ```
 
 The `echo: false` option disables the printing of code (only output is displayed).
