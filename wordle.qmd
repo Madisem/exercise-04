@@ -38,9 +38,6 @@ pick_solution<-function(table, n){
   return(word_array)
 }
 
- 
-a<-pick_solution(solution_list,5)
-a
 ```
 
 ```{r}
@@ -64,7 +61,7 @@ evalutate_guess<-function(guess, solution){
     }
   }
   print(paste("You have guessed ",letter_match+position_match," letters of the word!"))
-  if (length(setdiff(guess, sollution)) == 0){
+  if (length(setdiff(guess, solution)) == 0){
     output = 1
   }
   else {output = 0}
@@ -74,7 +71,6 @@ evalutate_guess<-function(guess, solution){
   
   
 check_guess<-function(guess,solution,valid_list){
-Flag="No"
 guess_word <- paste(guess, collapse = "")
 if (is.null(guess))  {
   print("Empty word! Enter the word!")
@@ -83,40 +79,63 @@ if (is.null(guess))  {
     print("Enter only the same length words as hidden behind")
     Flag="No"
   }
-  else if (!(guess_word %in% valid_list)){
+  else if (!(guess_word %in% valid_list[[1]])){
     print("Enter the valid words only!")
     Flag="No"
   }
   else {
-      Flag="Yes"}
+      Flag="Yes"
+      print(Flag)
+      }
 return(Flag)
 }
 
 play_wordle <- function(solution, valid_list, num_guesses=6){
-  print("Welcome to the Wordle game by Madina")
   print("You have 6 chances to predict the word hidden behind the blocks")
-  print("When you guess right the letter will be present")
-  Flag="No"
-  if (Flag == "No") {
-  enter <- toupper(readline("Type your word, then press <enter>: "))
-  guess<-unlist(strsplit(enter, split = ""))
-  check_guess(guess,solution,valid_list)
+  i=0
+  result = 0
+  while (i<7 | result == 0) {
+    Flag="No"
+    while (Flag == "No") {
+      enter <- toupper(readline("Type your word, then press <enter>: "))
+      guess<-unlist(strsplit(enter, split = ""))
+      Flag=check_guess(guess,solution,valid_list)
+      }
+    result<-evalutate_guess(guess,solution)
+    i=i+1
+    if (result == 1){
+      print("Congratulations you have guessed the word correctly!")
+    }
   }
-  if (Flag=="Yes"){
-    evalutate_guess(guess,solution)
-  }
-}
-play_wordle(a,valid_list,6)
+  print("Unforturnately, You run out of the chances!")}
+```
 
-###test
-enter <- toupper(readline("Type your word, then press <enter>: "))
-guess<-unlist(strsplit(enter, split = ""))
-for (i in guess){
-  print(guess[i])
-}
-a
-setdiff(guess,a)
+Start of the Game!
 
+```{r}
+print("Welcome to the Wordle game by Madina")
+n <- as.integer(readline("Please chose the length of the word you want to play, then press <enter>: "))
+
+df <- data.frame(
+  x = 1:n,
+  y = 1,
+  letters = rep("",n)
+)
+
+# Plot boxes with letters
+ggplot(df, aes(x = x, y = y, label = letters)) +
+  geom_tile(fill = "white", color = "black", size = 2) +  # Boxes
+  geom_text(size = 8) +  # Letters
+  theme_void() +  # Remove background
+  coord_fixed()
+
+
+print(LETTERS)
+a<-pick_solution(solution_list,n)
+play_wordle(a,valid_list)
+
+ 
+ 
 ```
 
 ```{r}
